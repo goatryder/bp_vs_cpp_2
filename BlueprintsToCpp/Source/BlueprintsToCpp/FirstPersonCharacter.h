@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Grabber.h"
 #include "FirstPersonCharacter.generated.h"
 
 UCLASS()
@@ -19,11 +20,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
+	UGrabber* GetGrabber();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	// axis
+	void Forward(float AxisValue);
+	void Right(float AxisValue);
+	
+	void Grab();  // implemented in UGrabber component
+	void Release();  // implemented in UGrabber component
 
 };

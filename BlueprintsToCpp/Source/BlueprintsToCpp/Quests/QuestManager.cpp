@@ -13,13 +13,36 @@ AQuestManager::AQuestManager()
 	UE_LOG(LogTemp, Warning, TEXT("QuestManager Constructor"));
 }
 
+void AQuestManager::CompleteQuest_Implementation(FName QuestId, bool CompleteWholeQuest)
+{
+	int32 QuestIndex = GetQuestIndex(QuestId);
+	FQuestInfo Quest = QuestList[QuestIndex];
+
+	if (CompleteWholeQuest)
+	{
+		// can we use here Quest.Progress = Quest.ProgressTotal???
+		QuestList[QuestIndex].Progress = Quest.ProgressTotal;
+	}
+	else
+	{
+		QuestList[QuestIndex].Progress = FMath::Min(Quest.Progress + 1, Quest.ProgressTotal);
+	}
+
+	CompletedQuest.Broadcast(QuestIndex);
+}
+
+FQuestInfo AQuestManager::GetQuest(FName Name) const
+{
+	return QuestList[GetQuestIndex(Name)];
+}
+
 // Called when the game starts or when spawned
 void AQuestManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	// ...
-	UE_LOG(LogTemp, Warning, TEXT("QuestManager BeginPlay"));
+	// UE_LOG(LogTemp, Warning, TEXT("QuestManager BeginPlay"));
 }
 
 // Called every frame
@@ -28,6 +51,6 @@ void AQuestManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// ...
-	UE_LOG(LogTemp, Warning, TEXT("QuestManager Tick"));
+	// UE_LOG(LogTemp, Warning, TEXT("QuestManager Tick"));
 }
 

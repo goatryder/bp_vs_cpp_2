@@ -7,21 +7,31 @@
 AQuestMarker::AQuestMarker()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	ParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
+
+	SetRootComponent(Root);
+	ParticleSystem->SetupAttachment(Root);
 }
 
-// Called when the game starts or when spawned
+void AQuestMarker::RefreshVisibility()
+{
+	FQuestInfo Quest = GetQuestManager()->GetQuest(QuestName);
+	bool Visibility = GetQuestManager()->IsActiveQuest(QuestName) && Quest.Progress == ShowAtProgress;
+	ParticleSystem->SetVisibility(Visibility);
+}
+
+void AQuestMarker::QuestUpdate(int32 Index)
+{
+	RefreshVisibility();
+}
+
+// Called when the game starts
 void AQuestMarker::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	GetQuestManager()->CompletedQuest.AddDynamic(this, &AQuestMarker::QuestUpdate);
+
+	RefreshVisibility();
 }
-
-// Called every frame
-void AQuestMarker::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
